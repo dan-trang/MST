@@ -11,15 +11,14 @@ using std::string;
 using std::vector;
 using std::ifstream;
 
-bool buildCityList(vector<string> cityList, const string fileName);
-bool readFromFile(vector<Destination> destinationArray, const string fileName);
+bool buildCityList(vector<string> & cityList, const string fileName);
+bool readFromFile(vector<Destination> & destinationArray, const string fileName);
 
 int main(){
-    cout << "test" << '\n';
     const string fileName = "city-pairs.txt";
     vector<Destination> destinationArray;
     vector<string> cityList;
-    assert (buildCityList(cityList, fileName));
+    buildCityList(cityList, fileName);
     //assert (!readFromFile(edgeArray, fileName));
     for (string i: cityList)
         cout << i << '\n';
@@ -30,7 +29,7 @@ int main(){
 * entry in each line of the input file.  It returns false if the
 * file name is unable to be opened.
 */
-bool buildCityList(vector<string> cityList, const string fileName){
+bool buildCityList(vector<string> & cityList, const string fileName){
     ifstream infile (fileName);
     if (!infile.is_open())
         return false;
@@ -45,7 +44,19 @@ bool buildCityList(vector<string> cityList, const string fileName){
     do{
         infile >> cityName;
         infile.ignore(1000, '\n');
+        /*
         if (std::find(cityList.begin(), cityList.end(), cityName) != cityList.end()){
+            cityList.push_back(cityName);
+        }
+        */
+        bool flag = false;
+        for (auto i: cityList){
+            if (i == cityName){
+                flag = true;
+                break;
+            }
+        }
+        if (flag == false){
             cityList.push_back(cityName);
         }
     }while (!infile.eof());
@@ -60,7 +71,7 @@ bool buildCityList(vector<string> cityList, const string fileName){
 * can not be opened.
 */
 
-bool readFromFile(vector<Destination> destinationArray, const string fileName){
+bool readFromFile(vector<Destination> & destinationArray, const string fileName){
     ifstream infile;
     infile.open(fileName);
     if (!infile.is_open()){
