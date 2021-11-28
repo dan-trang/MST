@@ -27,6 +27,8 @@ class City{
 
         City() : name(), destination(),
             visited(false){}
+        City(string newName) : name(newName), destination(),
+            visited(false){}
 
         string name;                        //Vertex name
         vector<Destination> destination;    //List of edges

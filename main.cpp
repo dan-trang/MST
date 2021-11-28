@@ -7,6 +7,7 @@
 
 using std::cin;
 using std::cout;
+using std::endl;
 using std::string;
 using std::vector;
 using std::ifstream;
@@ -18,8 +19,10 @@ int main(){
     const string fileName = "city-pairs.txt";
     vector<Destination> destinationArray;
     vector<City> cityList;
-    buildCityList(cityList, fileName);
-    //assert (!readFromFile(edgeArray, fileName));
+    if (!buildCityList(cityList, fileName)){
+        cout << "Error opening file \"" << fileName << "\"" << '\n';
+        return 1;
+    }
     for (City i: cityList){
         cout << i.name << '\n';
         for (Destination j: i.destination){
@@ -29,10 +32,10 @@ int main(){
     return 0;
 }
 
-/*This function builds a list of unique cities based on the first
-* entry in each line of the input file.  It returns false if the
-* file name is unable to be opened.
-*/
+/*This function builds a list of unique cities based on the first in each line
+ * of the input file.  Each City object's destination list
+ * is also populated.  It returns false if the file name is unable to be opened.
+ */
 bool buildCityList(vector<City> & cityList, const string fileName){
     ifstream infile (fileName);
     if (!infile.is_open())
@@ -43,18 +46,15 @@ bool buildCityList(vector<City> & cityList, const string fileName){
     int distance;
 
     /*The following code block reads in city names and stores them in a vector.
-    * Each string read in is checked for uniqueness with the std::find()
-    * function before being added.
-    */
+     * Each string read in is checked for uniqueness with the std::find()
+     * function before being added.  The destination and distance values are
+     * also read in and stored in the City object's destination list.
+     */
     do{
         infile >> cityName;
-        /*
-        if (std::find(cityList.begin(), cityList.end(), cityName) != cityList.end()){
-            cityList.push_back(cityName);
-        }
-        */
         bool flag = false;
-        for (auto i: cityList){
+        int i = 0;
+        for (auto &i: cityList){
             if (i.name == cityName){
                 flag = true;
                 infile >> destinationName >> distance;
@@ -71,32 +71,5 @@ bool buildCityList(vector<City> & cityList, const string fileName){
         }
         infile.ignore(1000, '\n');
     }while (!infile.eof());
-    return true;
-}
-
-/*This function reads data from a plain text file and stores the data
-* as Edge objects into an array.  The entries are delimited with new
-* lines, while an entry's individual attributes are delimited with
-* spaces.  If a vertex name is more than one word, the words are
-* delimited with a period.  The function returns false if the file
-* can not be opened.
-*/
-
-bool readFromFile(vector<Destination> & destinationArray, const string fileName){
-    ifstream infile;
-    infile.open(fileName);
-    if (!infile.is_open()){
-        return false;
-    }
-    string cityName;
-    string destinationName;
-    int distance;
-    infile >> cityName;
-
-    while (!infile.eof()){
-        infile >> cityName >> destinationName >> distance;
-        infile.ignore(1000, '\n');
-
-    }
     return true;
 }
