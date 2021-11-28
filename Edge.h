@@ -1,18 +1,20 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 using std::string;
 using std::cin;
 using std::cout;
+using std::vector;
 
 class Destination{
     public:
         // Constructor
-        Destination() : string destinationName(), int distance(0){}
+        Destination() : destinationName(""), distance(0){}
 
         Destination(string newDestination, int newDistance){
-            this.destinationName = newDestination;
-            this.distance = newDistance;
+            destinationName = newDestination;
+            distance = newDistance;
         }
 
         string destinationName;
@@ -23,8 +25,8 @@ class Destination{
 class City{
     public:
 
-        City() : string name(), vector<Destination> destination(),
-            bool visited(false){}
+        City() : name(), destination(),
+            visited(false){}
 
         string name;                        //Vertex name
         vector<Destination> destination;    //List of edges

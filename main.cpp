@@ -3,69 +3,78 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <assert.h>
 
-using std::cin
-using std::cout
-using std::string
-using std::vector
-using std::map
+using std::cin;
+using std::cout;
+using std::string;
+using std::vector;
+using std::ifstream;
 
+bool buildCityList(vector<string> cityList, const string fileName);
+bool readFromFile(vector<Destination> destinationArray, const string fileName);
 
 int main(){
-    const string fileName = "city-pairs.txt"
-    vector<Edge> edgeArray;
-    map<string, int> cityList;
-    assert (!buildCityList(cityList, fileName));
-    assert (!readFromFile(edgeArray, fileName));
-
+    cout << "test" << '\n';
+    const string fileName = "city-pairs.txt";
+    vector<Destination> destinationArray;
+    vector<string> cityList;
+    assert (buildCityList(cityList, fileName));
+    //assert (!readFromFile(edgeArray, fileName));
+    for (string i: cityList)
+        cout << i << '\n';
+    return 0;
 }
 
+/*This function builds a list of unique cities based on the first
+* entry in each line of the input file.  It returns false if the
+* file name is unable to be opened.
+*/
 bool buildCityList(vector<string> cityList, const string fileName){
     ifstream infile (fileName);
-    if (!infile.isopen())
+    if (!infile.is_open())
         return false;
     
     string cityName;
     string tmp;
 
-    /*The following code block reads in city names and maps them to integers (i).
-    * Each string read in is checked for uniqueness with the cityList.find()
-    * function before being added.  The iterator i is incremented whenever a
-    * unique city name is added to the map.
+    /*The following code block reads in city names and stores them in a vector.
+    * Each string read in is checked for uniqueness with the std::find()
+    * function before being added.
     */
-    int i = 1;
     do{
         infile >> cityName;
         infile.ignore(1000, '\n');
-        if (std::find(cityList.begin(), cityList.end(), cityName != cityList.end())){
-            cityList.pushback(cityName);
-            ++i;
+        if (std::find(cityList.begin(), cityList.end(), cityName) != cityList.end()){
+            cityList.push_back(cityName);
         }
     }while (!infile.eof());
+    return true;
 }
 
 /*This function reads data from a plain text file and stores the data
 * as Edge objects into an array.  The entries are delimited with new
 * lines, while an entry's individual attributes are delimited with
 * spaces.  If a vertex name is more than one word, the words are
-* delimited with a period.
+* delimited with a period.  The function returns false if the file
+* can not be opened.
 */
 
-bool readFromFile(vector<Edge> edgeArray, const string fileName){
-    //<vector>.pushback() adds an element to the end of a vector
+bool readFromFile(vector<Destination> destinationArray, const string fileName){
     ifstream infile;
     infile.open(fileName);
-    if (!infile.isopen()){
+    if (!infile.is_open()){
         return false;
     }
     string cityName;
     string destinationName;
     int distance;
-    infile << cityName;
+    infile >> cityName;
 
     while (!infile.eof()){
         infile >> cityName >> destinationName >> distance;
         infile.ignore(1000, '\n');
 
     }
+    return true;
 }
