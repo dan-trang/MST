@@ -11,17 +11,21 @@ using std::string;
 using std::vector;
 using std::ifstream;
 
-bool buildCityList(vector<string> & cityList, const string fileName);
+bool buildCityList(vector<City> & cityList, const string fileName);
 bool readFromFile(vector<Destination> & destinationArray, const string fileName);
 
 int main(){
     const string fileName = "city-pairs.txt";
     vector<Destination> destinationArray;
-    vector<string> cityList;
+    vector<City> cityList;
     buildCityList(cityList, fileName);
     //assert (!readFromFile(edgeArray, fileName));
-    for (string i: cityList)
-        cout << i << '\n';
+    for (City i: cityList){
+        cout << i.name << '\n';
+        for (Destination j: i.destination){
+            cout << '\t' << j.destinationName << ", " << j.distance << '\n';
+        }
+    }
     return 0;
 }
 
@@ -29,13 +33,14 @@ int main(){
 * entry in each line of the input file.  It returns false if the
 * file name is unable to be opened.
 */
-bool buildCityList(vector<string> & cityList, const string fileName){
+bool buildCityList(vector<City> & cityList, const string fileName){
     ifstream infile (fileName);
     if (!infile.is_open())
         return false;
     
     string cityName;
-    string tmp;
+    string destinationName;
+    int distance;
 
     /*The following code block reads in city names and stores them in a vector.
     * Each string read in is checked for uniqueness with the std::find()
@@ -43,7 +48,6 @@ bool buildCityList(vector<string> & cityList, const string fileName){
     */
     do{
         infile >> cityName;
-        infile.ignore(1000, '\n');
         /*
         if (std::find(cityList.begin(), cityList.end(), cityName) != cityList.end()){
             cityList.push_back(cityName);
@@ -51,14 +55,21 @@ bool buildCityList(vector<string> & cityList, const string fileName){
         */
         bool flag = false;
         for (auto i: cityList){
-            if (i == cityName){
+            if (i.name == cityName){
                 flag = true;
-                break;
+                infile >> destinationName >> distance;
+                Destination *newDestination = new Destination(destinationName, distance);
+                i.destination.push_back(*newDestination);
             }
         }
         if (flag == false){
-            cityList.push_back(cityName);
+            City *newCity = new City(cityName);
+            cityList.push_back(*newCity);
+            infile >> destinationName >> distance;
+            Destination *newDestination = new Destination(destinationName, distance);
+            cityList.back().destination.push_back(*newDestination);
         }
+        infile.ignore(1000, '\n');
     }while (!infile.eof());
     return true;
 }
