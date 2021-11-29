@@ -15,8 +15,8 @@ using std::ifstream;
 
 //Function forward declarations
 bool buildCityList(vector<City> & cityList, const string fileName);
-int prims(vector<City> & cityList);
-int primsRecursive(vector<City> cityList, vector<string> & visitedList, City currentCity, vector<PQ> priorityList);
+int prims(vector<City> & cityList, vector<string> & visitedList);
+int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& currentCity, vector<PQ> priorityList);
 bool visited(string checkCity, vector<string> visitedList);
 
 
@@ -37,6 +37,8 @@ int main(){
             cout << '\t' << j.destinationName << ", " << j.distance << '\n';
         }
     }
+    int total = prims(cityList, visitedList);
+    cout << endl << "Total distance: " << total;
     return 0;
 }
 
@@ -61,7 +63,6 @@ bool buildCityList(vector<City> & cityList, const string fileName){
     do{
         infile >> cityName;
         bool flag = false;
-        int i = 0;
         for (auto &i: cityList){
             if (i.name == cityName){
                 flag = true;
@@ -95,42 +96,61 @@ int prims(vector<City> & cityList, vector<string> & visitedList){
         return 0;
     else{
         vector<PQ> priorityList; 
-        return primsRecursive(cityList, visitedList, cityList[0], priorityList);
+        City* currentCity = new City(cityList[0]);
+        return primsRecursive(cityList, visitedList, currentCity, priorityList);
     }
 }
 
-int primsRecursive(vector<City> cityList, vector<string> & visitedList, City currentCity, vector<PQ> priorityList){ 
+int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& currentCity, vector<PQ> priorityList){ 
     if (cityList.empty())
         return 0;
+    
+    visitedList.push_back(currentCity->name);
+    for (long unsigned int i = 0; i < cityList.size(); i++){
+        if (currentCity->name == cityList[i].name){
+            cityList.erase(cityList.begin() + i);
+            break;
+        }
+    }
 
     //for loop to add new unvisited cities to priority list
-    for (Destination i: currentCity.destination){
-        if (visited(currentCity.destination[i].destinationName, visitedList) == false){ 
-            PQ * newEdge = new PQ(currentCity.name, currentCity.destination[i].destinationName, currentCity.destination[i].distance);
+    for (long unsigned int i = 0; i < currentCity->destination.size(); i++){
+        if (visited(currentCity->destination[i].destinationName, visitedList) == false){ 
+            PQ * newEdge = new PQ(currentCity->name, currentCity->destination[i].destinationName, currentCity->destination[i].distance);
             priorityList.push_back(*newEdge);
         }
     }
 
     //for loop to find the nearest City and index of that city in the priority list
-    int smallestDistance = 0;
+    int smallestDistance = priorityList[0].distance;
     int smallestIndex = 0;
-    for (int j = 0; j < priorityList.size(); j++){
+    for (long unsigned int j = 0; j < priorityList.size(); j++){
         if (priorityList[j].distance < smallestDistance){
             smallestIndex = j;
             smallestDistance = priorityList[j].distance;
         }
     }
 
-    cout << priorityList[j].startCity << "(" << priorityList[j].endCity << ", " << priorityList[j].distance << ")\n";   //prints out MST edge
-    visitedList.push_back(priorityList[j].endCity);     //add destination city to list of visited
-    priorityList.erase (priorityList.begin() + j);      //pops entry from priority list
+    cout << priorityList[smallestIndex].startCity << "(" << priorityList[smallestIndex].endCity << "), " << priorityList[smallestIndex].distance << "\n";   //prints out MST edge
+    //visitedList.push_back(priorityList[smallestIndex].endCity);     //add destination city to list of visited
 
-    for (auto i: cityList){
-        if (visitedList.back() == cityList[i].name){
-            currentCity = cityList[i];
+    for (long unsigned int i = 0; i < cityList.size(); i++){
+        if (priorityList[smallestIndex].endCity == cityList[i].name){
+            currentCity = new City(cityList[i]);
+            cityList.erase(cityList.begin() + i);
             break;
         }
     }
 
+    priorityList.erase (priorityList.begin() + smallestIndex);      //pops entry from priority list
+
     return smallestDistance + primsRecursive(cityList, visitedList, currentCity, priorityList);
+}
+
+bool visited(string checkCity, vector<string> visitedList){
+    for (long unsigned int i = 0; i < visitedList.size(); i++){
+        if (checkCity == visitedList[i])
+            return true;
+    }
+    return false;
 }

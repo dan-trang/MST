@@ -17,6 +17,13 @@ class Destination{
             distance = newDistance;
         }
 
+        /*
+        Destination(const Destination &aDestination){
+            this->destinationName = aDestination.destinationName;
+            this->distance = aDestination.distance;
+        }
+        */
+
         string destinationName;
         int distance;
 
@@ -29,6 +36,11 @@ class City{
             visited(false){}
         City(string newName) : name(newName), destination(),
             visited(false){}
+        City(const City &aCity){
+            this->name = aCity.name;
+            this->destination = aCity.destination;
+            this->visited = aCity.visited;
+        }
 
         string name;                        //Vertex name
         vector<Destination> destination;    //List of edges
