@@ -13,22 +13,25 @@ using std::vector;
 using std::ifstream;
 
 bool buildCityList(vector<City> & cityList, const string fileName);
-bool readFromFile(vector<Destination> & destinationArray, const string fileName);
+int prims(vector<City> & cityList);
 
 int main(){
     const string fileName = "city-pairs.txt";
     vector<Destination> destinationArray;
     vector<City> cityList;
+    vector<PQ> priorityQueue;
     if (!buildCityList(cityList, fileName)){
         cout << "Error opening file \"" << fileName << "\"" << '\n';
         return 1;
     }
+    /*
     for (City i: cityList){
         cout << i.name << '\n';
         for (Destination j: i.destination){
             cout << '\t' << j.destinationName << ", " << j.distance << '\n';
         }
     }
+    */
     return 0;
 }
 
@@ -53,7 +56,6 @@ bool buildCityList(vector<City> & cityList, const string fileName){
     do{
         infile >> cityName;
         bool flag = false;
-        int i = 0;
         for (auto &i: cityList){
             if (i.name == cityName){
                 flag = true;
@@ -72,4 +74,14 @@ bool buildCityList(vector<City> & cityList, const string fileName){
         infile.ignore(1000, '\n');
     }while (!infile.eof());
     return true;
+}
+
+/* This function implements Prim's greedy algorithm for finding a minimum 
+ * spanning tree (MST).  For simplicity, the resulting tree will be represented
+ * as a matrix where each square representing a nonexistent or not-utilized edge
+ * contains a 0 and each edge used in the the MST displays the edge's weight.
+ * The function keeps a running total of the overall weight as edges are added
+ * to the MST.
+ */
+int prims(vector<City> & cityList){
 }
