@@ -125,6 +125,12 @@ int primsRecursive(vector<City> cityList, vector<string> & visitedList, City cur
     visitedList.push_back(priorityList[j].endCity);     //add destination city to list of visited
     priorityList.erase (priorityList.begin() + j);      //pops entry from priority list
 
-    currentCity = //find some way to index the next city
+    for (auto i: cityList){
+        if (visitedList.back() == cityList[i].name){
+            currentCity = cityList[i];
+            break;
+        }
+    }
+
     return smallestDistance + primsRecursive(cityList, visitedList, currentCity, priorityList);
 }
