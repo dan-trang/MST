@@ -31,14 +31,18 @@ int main(){
         cout << "Error opening file \"" << fileName << "\"" << '\n';
         return 1;
     }
+
+    /*
     for (City i: cityList){
         cout << i.name << '\n';
         for (Destination j: i.destination){
             cout << '\t' << j.destinationName << ", " << j.distance << '\n';
         }
     }
+    */
+
     int total = prims(cityList, visitedList);
-    cout << endl << "Total distance: " << total;
+    cout << endl << "Total distance: " << total << endl;
     return 0;
 }
 
@@ -122,12 +126,14 @@ int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& 
     }
 
     //for loop to find the nearest City and index of that city in the priority list
-    int smallestDistance = priorityList[0].distance;
+    int smallestDistance = 0;
     int smallestIndex = 0;
     for (long unsigned int j = 0; j < priorityList.size(); j++){
-        if (priorityList[j].distance < smallestDistance){
-            smallestIndex = j;
-            smallestDistance = priorityList[j].distance;
+        if (!visited(priorityList[j].endCity, visitedList)){
+            if (smallestDistance == 0 || priorityList[j].distance < smallestDistance){
+                smallestIndex = j;
+                smallestDistance = priorityList[j].distance;
+            }
         }
     }
 
