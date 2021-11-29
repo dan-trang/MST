@@ -16,6 +16,8 @@ using std::ifstream;
 //Function forward declarations
 bool buildCityList(vector<City> & cityList, const string fileName);
 int prims(vector<City> & cityList);
+int primsRecursive(vector<City> cityList, vector<string> & visitedList, City currentCity, vector<PQ> priorityList);
+bool visited(string checkCity, vector<string> visitedList);
 
 
 //Main 
@@ -23,7 +25,6 @@ int main(){
     const string fileName = "city-pairs.txt";
     vector<Destination> destinationArray;
     vector<City> cityList;
-    vector<PQ> priorityList;
     vector<string> visitedList;
     
     if (!buildCityList(cityList, fileName)){
@@ -89,7 +90,41 @@ bool buildCityList(vector<City> & cityList, const string fileName){
  * The function keeps a running total of the overall weight as edges are added
  * to the MST.
  */
-int prims(vector<City> & cityList){
+int prims(vector<City> & cityList, vector<string> & visitedList){ 
+    if (cityList.empty())
+        return 0;
+    else{
+        vector<PQ> priorityList; 
+        return primsRecursive(cityList, visitedList, cityList[0], priorityList);
+    }
 }
 
+int primsRecursive(vector<City> cityList, vector<string> & visitedList, City currentCity, vector<PQ> priorityList){ 
+    if (cityList.empty())
+        return 0;
 
+    //for loop to add new unvisited cities to priority list
+    for (Destination i: currentCity.destination){
+        if (visited(currentCity.destination[i].destinationName, visitedList) == false){ 
+            PQ * newEdge = new PQ(currentCity.name, currentCity.destination[i].destinationName, currentCity.destination[i].distance);
+            priorityList.push_back(*newEdge);
+        }
+    }
+
+    //for loop to find the nearest City and index of that city in the priority list
+    int smallestDistance = 0;
+    int smallestIndex = 0;
+    for (int j = 0; j < priorityList.size(); j++){
+        if (priorityList[j].distance < smallestDistance){
+            smallestIndex = j;
+            smallestDistance = priorityList[j].distance;
+        }
+    }
+
+    cout << priorityList[j].startCity << "(" << priorityList[j].endCity << ", " << priorityList[j].distance << ")\n";   //prints out MST edge
+    visitedList.push_back(priorityList[j].endCity);     //add destination city to list of visited
+    priorityList.erase (priorityList.begin() + j);      //pops entry from priority list
+
+    currentCity = //find some way to index the next city
+    return smallestDistance + primsRecursive(cityList, visitedList, currentCity, priorityList);
+}
