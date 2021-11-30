@@ -14,15 +14,18 @@ using std::vector;
 using std::ifstream;
 
 //Function forward declarations
-bool buildCityList(vector<City> & cityList, const string fileName);
-bool visited(string checkCity, vector<string> visitedList);
-void display(vector<City> cityList);
+bool buildCityList (vector<City> & cityList, const string fileName);
+bool visited (string checkCity, vector<string> visitedList);
+void displayCity (vector<City> cityList);
+void displayPQ (vector<PQ> pqList);
+void quicksort (vector<PQ> & pqList, int l, int r);
+void swap (vector<PQ> & pqList, int l, int r);
+int partition (vector<PQ> & pqList, int l, int r);
 
 int prims(vector<City> & cityList, vector<string> & visitedList);
 int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& currentCity, vector<PQ> priorityList);
 
-//int kruskals(vector<City> & cityList, )
-
+int kruskals(vector<City> & cityList);
 
 //Main 
 int main(){
@@ -36,22 +39,24 @@ int main(){
         return 1;
     }
 
+    /*
     // ***************** PRIM'S ALGO ************************** //
+    cout << "=============================================\n";
     cout << "\t Prim's Algorithm Solution\n";
     cout << "=============================================\n";
     int total = prims(cityList, visitedList);
     cout << endl << "Total distance [prims]: " << total << endl;
     // ******************************************************** //
+    */
 
-    display(cityList);
+    //displayCity(cityList);
 
     // ***************** KRUSKAL'S ALGO ************************//
-    /*
+    cout << "\n=============================================\n";
     cout << "\t Kruskal's Algorithm Solution\n";
     cout << "=============================================\n";
-    int total = kruskals(cityList, )
-    cout << endl; << "Total distance [kruskals]: " << total << endl;
-    */
+    int total = kruskals(cityList);
+    cout << endl << "Total distance [kruskals]: " << total << endl;
 
 
     return 0;
@@ -107,13 +112,62 @@ bool visited(string checkCity, vector<string> visitedList){
     return false;
 }
 
-void display(vector<City> cityList){
+void displayCity(vector<City> cityList){
     for (City i: cityList){
         cout << i.name << '\n';
         for (Destination j: i.destination){
             cout << '\t' << j.destinationName << ", " << j.distance << '\n';
         }
     }
+}
+
+void displayPQ(vector<PQ> pqList){
+    for (PQ i: pqList){
+        cout << i.startCity << " " << i.endCity << " " << i.distance << endl;
+    }
+}
+
+void quicksort (vector<PQ> & pqList, int l, int r){
+    if (l < r){
+        int s = partition(pqList, l, r);
+        if (s - 1 >= 0)
+            quicksort (pqList, l, s-1);
+        if (s + 1 <= r)
+            quicksort (pqList, s+1, r);
+    }
+    else
+        return;
+}
+
+int partition (vector<PQ> & pqList, int l, int r){
+    int pivot = pqList[r].distance;
+    int j = (l - 1);
+
+    for (int i = 1; i <= r-1; ++i){
+        if (pqList[i].distance <= pivot){
+            j++;
+            swap (pqList, j, i);
+        }
+    }
+    swap (pqList, j+1, r);
+    return (j+1);
+}
+
+void swap (vector<PQ> & pqList, int l, int r){
+    //store and save PQ left index values temporarily
+    string tempStartCity = pqList[l].startCity;
+    string tempEndCity = pqList[l].endCity;
+    int tempDistance = pqList[l].distance;
+
+    //copy PQ right to PQ left
+    pqList[l].startCity = pqList[r].startCity;
+    pqList[l].endCity = pqList[r].endCity;
+    pqList[l].distance = pqList[r].distance;
+
+    //copy PQ temp into PQ right
+    pqList[r].startCity = tempStartCity;
+    pqList[r].endCity = tempEndCity;
+    pqList[r].distance = tempDistance;
 }
 
 /* This function implements Prim's greedy algorithm for finding a minimum 
@@ -181,3 +235,35 @@ int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& 
     return smallestDistance + primsRecursive(cityList, visitedList, currentCity, priorityList);
 }
 
+
+/* Kruskal's Algorithm implements a Union Find or disjoint abstract data structure to keep track of
+* separate branches or groups inside the graph. Once all the groups are connected, the MST is found.
+* The key difference is that the edges are all sorted in ascending order, then algorithmicly selected
+* to find the MST.
+*/
+int kruskals(vector<City> & cityList){
+    if (cityList.empty())
+        return 0;
+
+    vector<PQ> sortedList;  //container to gather all the edges and sort in ascending order
+
+    for (long unsigned int i = 0; i < cityList.size(); ++i){
+        for (long unsigned int j = 0; j < cityList[i].destination.size(); ++j){
+            PQ * newEdge = new PQ(cityList[i].name, cityList[i].destination[j].destinationName,
+                                  cityList[i].destination[j].distance);
+            sortedList.push_back(*newEdge);
+        }
+    }
+
+    int rightIndex = sortedList.size();
+    int leftIndex = 0;
+
+    cout << rightIndex << endl;
+    cout << sortedList[rightIndex-1].distance << endl;
+
+    quicksort(sortedList, leftIndex, rightIndex - 1); 
+    displayPQ(sortedList);  
+
+
+    return -1;
+}
