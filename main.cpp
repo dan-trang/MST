@@ -15,9 +15,13 @@ using std::ifstream;
 
 //Function forward declarations
 bool buildCityList(vector<City> & cityList, const string fileName);
+bool visited(string checkCity, vector<string> visitedList);
+void display(vector<City> cityList);
+
 int prims(vector<City> & cityList, vector<string> & visitedList);
 int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& currentCity, vector<PQ> priorityList);
-bool visited(string checkCity, vector<string> visitedList);
+
+//int kruskals(vector<City> & cityList, )
 
 
 //Main 
@@ -32,17 +36,24 @@ int main(){
         return 1;
     }
 
+    // ***************** PRIM'S ALGO ************************** //
+    cout << "\t Prim's Algorithm Solution\n";
+    cout << "=============================================\n";
+    int total = prims(cityList, visitedList);
+    cout << endl << "Total distance [prims]: " << total << endl;
+    // ******************************************************** //
+
+    display(cityList);
+
+    // ***************** KRUSKAL'S ALGO ************************//
     /*
-    for (City i: cityList){
-        cout << i.name << '\n';
-        for (Destination j: i.destination){
-            cout << '\t' << j.destinationName << ", " << j.distance << '\n';
-        }
-    }
+    cout << "\t Kruskal's Algorithm Solution\n";
+    cout << "=============================================\n";
+    int total = kruskals(cityList, )
+    cout << endl; << "Total distance [kruskals]: " << total << endl;
     */
 
-    int total = prims(cityList, visitedList);
-    cout << endl << "Total distance: " << total << endl;
+
     return 0;
 }
 
@@ -87,6 +98,23 @@ bool buildCityList(vector<City> & cityList, const string fileName){
     return true;
 }
 
+//Utility function to compare string name to list of visited cities in a vector
+bool visited(string checkCity, vector<string> visitedList){
+    for (long unsigned int i = 0; i < visitedList.size(); i++){
+        if (checkCity == visitedList[i])
+            return true;
+    }
+    return false;
+}
+
+void display(vector<City> cityList){
+    for (City i: cityList){
+        cout << i.name << '\n';
+        for (Destination j: i.destination){
+            cout << '\t' << j.destinationName << ", " << j.distance << '\n';
+        }
+    }
+}
 
 /* This function implements Prim's greedy algorithm for finding a minimum 
  * spanning tree (MST).  For simplicity, the resulting tree will be represented
@@ -153,10 +181,3 @@ int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& 
     return smallestDistance + primsRecursive(cityList, visitedList, currentCity, priorityList);
 }
 
-bool visited(string checkCity, vector<string> visitedList){
-    for (long unsigned int i = 0; i < visitedList.size(); i++){
-        if (checkCity == visitedList[i])
-            return true;
-    }
-    return false;
-}
