@@ -19,7 +19,7 @@ bool visited (string checkCity, vector<string> visitedList);
 void displayCity (vector<City> cityList);
 void displayPQ (vector<PQ> pqList);
 void quicksort (vector<PQ> & pqList, int l, int r);
-void swap (vector<PQ> & pqList, int l, int r);
+void swap(PQ * x, PQ * y);
 int partition (vector<PQ> & pqList, int l, int r);
 
 int prims(vector<City> & cityList, vector<string> & visitedList);
@@ -127,47 +127,45 @@ void displayPQ(vector<PQ> pqList){
     }
 }
 
-void quicksort (vector<PQ> & pqList, int l, int r){
-    if (l < r){
-        int s = partition(pqList, l, r);
-        if (s - 1 >= 0)
-            quicksort (pqList, l, s-1);
-        if (s + 1 <= r)
-            quicksort (pqList, s+1, r);
+void quicksort (vector<PQ> & pqList, int first, int last){
+    if (first < last){
+        //variable p is our partitioned index
+        int p = partition(pqList, first, last);
+
+        //recursively call on first half and last half of vector
+        quicksort (pqList, first, p-1);
+        quicksort (pqList, p+1, last);
     }
-    else
-        return;
 }
 
-int partition (vector<PQ> & pqList, int l, int r){
-    int pivot = pqList[r].distance;
-    int j = (l - 1);
+int partition (vector<PQ> & pqList, int first, int last){
+    int pivot = pqList[last].distance;
+    int i = (first - 1);
 
-    for (int i = 1; i <= r-1; ++i){
-        if (pqList[i].distance <= pivot){
-            j++;
-            swap (pqList, j, i);
+    for (int j = first; j <= (last-1); ++j){
+        if (pqList[j].distance <= pivot){
+            i++;
+            swap(&pqList[i], &pqList[j]);
         }
     }
-    swap (pqList, j+1, r);
-    return (j+1);
+
+    swap(&pqList[i+1], &pqList[last]);
+    return (i + 1);
 }
 
-void swap (vector<PQ> & pqList, int l, int r){
-    //store and save PQ left index values temporarily
-    string tempStartCity = pqList[l].startCity;
-    string tempEndCity = pqList[l].endCity;
-    int tempDistance = pqList[l].distance;
+void swap(PQ * x, PQ * y){
+    string tempStartCity = x->startCity;
+    string tempEndCity = x->endCity;
+    int tempDistance = x->distance;
 
-    //copy PQ right to PQ left
-    pqList[l].startCity = pqList[r].startCity;
-    pqList[l].endCity = pqList[r].endCity;
-    pqList[l].distance = pqList[r].distance;
+    x->startCity = y->startCity;
+    x->endCity = y->endCity;
+    x->distance = y->distance;
 
-    //copy PQ temp into PQ right
-    pqList[r].startCity = tempStartCity;
-    pqList[r].endCity = tempEndCity;
-    pqList[r].distance = tempDistance;
+    y->startCity = tempStartCity;
+    y->endCity = tempEndCity;
+    y->distance = tempDistance;
+    return;
 }
 
 /* This function implements Prim's greedy algorithm for finding a minimum 
