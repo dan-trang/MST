@@ -1,10 +1,12 @@
 #include <iostream>
 #include "City.h"
 #include "PQ.h"
+#include "UnionFind.h"
 #include <vector>
 #include <fstream>
 #include <algorithm>
 #include <assert.h>
+#include <unordered_map>
 
 using std::cin;
 using std::cout;
@@ -29,16 +31,15 @@ int kruskals(vector<City> & cityList);
 
 //Main 
 int main(){
-    const string fileName = "city-pairs.txt";
+    const string fileName = "bestcase1.txt";
     vector<Destination> destinationArray;
     vector<City> cityList;
     vector<string> visitedList;
-    
     if (!buildCityList(cityList, fileName)){
         cout << "Error opening file \"" << fileName << "\"" << '\n';
         return 1;
     }
-
+    
     /*
     // ***************** PRIM'S ALGO ************************** //
     cout << "=============================================\n";
@@ -49,14 +50,13 @@ int main(){
     // ******************************************************** //
     */
 
-    //displayCity(cityList);
-
     // ***************** KRUSKAL'S ALGO ************************//
     cout << "\n=============================================\n";
     cout << "\t Kruskal's Algorithm Solution\n";
     cout << "=============================================\n";
     int total = kruskals(cityList);
     cout << endl << "Total distance [kruskals]: " << total << endl;
+    // ********************************************************* //
 
 
     return 0;
@@ -240,12 +240,15 @@ int primsRecursive(vector<City> cityList, vector<string> & visitedList, City *& 
 * to find the MST.
 */
 int kruskals(vector<City> & cityList){
+    vector<PQ> sortedList;  //container to gather all the edges and sort in ascending order
+    std::unordered_map<string, int> bijection_map;  //hashmap containing unique cities and indexing them
+    int numCities = cityList.size();
+
     if (cityList.empty())
         return 0;
 
-    vector<PQ> sortedList;  //container to gather all the edges and sort in ascending order
-
-    for (long unsigned int i = 0; i < cityList.size(); ++i){
+    for (long unsigned int i = 0; i < numCities; ++i){
+        bijection_map[cityList[i].name] = i;
         for (long unsigned int j = 0; j < cityList[i].destination.size(); ++j){
             PQ * newEdge = new PQ(cityList[i].name, cityList[i].destination[j].destinationName,
                                   cityList[i].destination[j].distance);
@@ -253,15 +256,36 @@ int kruskals(vector<City> & cityList){
         }
     }
 
+    /* TEST PRINT OUT BIJECTION MAP
+    for (auto const &pair: bijection_map){
+        cout << "{" << pair.first << ": " << pair.second << "}\n";
+    }
+    */
+
+    //variables to index the left and right most of the vectors
     int rightIndex = sortedList.size();
     int leftIndex = 0;
 
-    cout << rightIndex << endl;
-    cout << sortedList[rightIndex-1].distance << endl;
-
+    //Sorts edges in sortedList in non-descending order
     quicksort(sortedList, leftIndex, rightIndex - 1); 
-    displayPQ(sortedList);  
+    //displayPQ(sortedList);  
 
+    UnionFind * unionObject = new UnionFind(numCities);
+    //initializing variables for union find
+    int total_distance = 0, edges = 0;
+    while (edges < (numCities - 1)){      //|E| = |V| - 1 to make a spanning tree, exit condition is # of edges
+        for (long unsigned int i = 0; i < rightIndex; i++){     //iterate through only as much as max of sortedList
+            int p = bijection_map[sortedList[i].startCity];
+            int q = bijection_map[sortedList[i].endCity];
 
-    return -1;
+            if (unionObject->unify(p, q)){
+                cout << sortedList[i].startCity << "<-->" << sortedList[i].endCity;
+                cout << " [" << sortedList[i].distance << "]\n";
+                total_distance += sortedList[i].distance;
+                ++edges; 
+            }
+        }
+    }
+
+    return total_distance;
 }
