@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <unordered_map>
+#include <chrono>
 
 using std::cin;
 using std::cout;
@@ -31,7 +32,7 @@ int kruskals(vector<City> & cityList);
 
 //Main 
 int main(){
-    const string fileName = "bestcase1.txt";
+    const string fileName = "trial10.txt";
     vector<Destination> destinationArray;
     vector<City> cityList;
     vector<string> visitedList;
@@ -39,7 +40,14 @@ int main(){
         cout << "Error opening file \"" << fileName << "\"" << '\n';
         return 1;
     }
-    
+
+
+    //import chrono standard naming
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+
     /*
     // ***************** PRIM'S ALGO ************************** //
     cout << "=============================================\n";
@@ -54,10 +62,14 @@ int main(){
     cout << "\n=============================================\n";
     cout << "\t Kruskal's Algorithm Solution\n";
     cout << "=============================================\n";
+    auto t1 = high_resolution_clock::now(); 
     int total = kruskals(cityList);
+    auto t2 = high_resolution_clock::now();
     cout << endl << "Total distance [kruskals]: " << total << endl;
     // ********************************************************* //
 
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+    cout << "Execution Time = " << ms_int.count() << "ms" << endl;
 
     return 0;
 }
